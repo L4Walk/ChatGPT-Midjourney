@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef,useState } from "react";
 
 import styles from "./home.module.scss";
 
@@ -11,6 +11,10 @@ import CloseIcon from "../icons/close.svg";
 import MaskIcon from "../icons/mask.svg";
 import GemIcon from "../icons/gem.svg";
 import DragIcon from "../icons/drag.svg";
+import ChatLogo from "../icons/Chatbot.svg";
+import EmailIcon from "../icons/email.svg";
+import PluginIcon from "../icons/plugin.svg";
+import AccountIcon from "../icons/account.svg";
 
 import Locale from "../locales";
 
@@ -28,6 +32,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
 import { showConfirm, showToast } from "./ui-lib";
+import { SetAccount } from "./account";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -108,6 +113,8 @@ export function SideBar(props: { className?: string }) {
   const navigate = useNavigate();
   const config = useAppConfig();
 
+  const [accountAPI, setAccountAPI] = useState(false);
+
   useHotKey();
 
   return (
@@ -118,17 +125,26 @@ export function SideBar(props: { className?: string }) {
     >
       <div className={styles["sidebar-header"]} data-tauri-drag-region>
         <div className={styles["sidebar-title"]} data-tauri-drag-region>
-          ChatGPT-Midjourney
+          SciChat
         </div>
         <div className={styles["sidebar-sub-title"]}>
-          Your own AI assistant.
+          您的私人AI助理^_^
         </div>
         <div className={styles["sidebar-logo"] + " no-dark"}>
-          <ChatGptIcon />
+          <ChatLogo />
         </div>
       </div>
 
       <div className={styles["sidebar-header-bar"]}>
+        <IconButton
+          icon={<AccountIcon />}
+          text={shouldNarrow ? undefined : "账户"}
+          className={styles["sidebar-bar-button"]}
+          onClick={() => {
+            setAccountAPI(true);
+          }}
+          shadow
+        />
         <IconButton
           icon={<MaskIcon />}
           text={shouldNarrow ? undefined : Locale.Mask.Name}
@@ -136,11 +152,12 @@ export function SideBar(props: { className?: string }) {
           onClick={() => navigate(Path.NewChat, { state: { fromHome: true } })}
           shadow
         />
+        
         <IconButton
-          icon={<GemIcon />}
-          text={shouldNarrow ? undefined : "Pro"}
+          icon={<PluginIcon />}
+          text={shouldNarrow ? undefined : Locale.Plugin.Name}
           className={styles["sidebar-bar-button"]}
-          onClick={() => window.open(REPO_URL + "-Pro", "_blank")}
+          onClick={() => showToast(Locale.WIP)}
           shadow
         />
       </div>
@@ -202,6 +219,16 @@ export function SideBar(props: { className?: string }) {
       >
         <DragIcon />
       </div>
+
+      {accountAPI && (
+        <SetAccount
+          onClose={() => {
+            setAccountAPI(false);
+            
+          }}
+        />
+      )}
+
     </div>
   );
 }
